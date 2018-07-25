@@ -21,8 +21,8 @@ func TestParser(t *testing.T) {
 
 	//Inputs
 	conf := &config{}
-	fileBytes := readFile("./config.json")
-	fileBytesBadFormated := readFile("./config_bad.json")
+	fileBytes := readFile("./etc/config.json")
+	fileBytesBadFormated := readFile("./etc/config_bad.json")
 
 	type inputs struct {
 		File []byte
