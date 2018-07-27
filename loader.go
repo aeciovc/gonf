@@ -1,39 +1,28 @@
 package gonf
 
 import (
-	"io"
-	"io/ioutil"
-	"os"
 	"log"
 )
 
 // Load the config file
-func Load(configFile string, struc interface{}) error{
+func Load(filePath string, struc interface{}) error{
 
-	var err error
-	var input = io.ReadCloser(os.Stdin)
+	//Build OS reader
+	reader := new(ReaderOS)
 	
-	log.Println(configFile)
-
-	//Trying open file
-	if input, err = os.Open(configFile); err != nil {
-		log.Fatalln(TAG, err)
-		return ErrFileNotFound
-	}
-
-	// Read the config file
-	contentBytes, err := ioutil.ReadAll(input)
-	input.Close()
-	if err != nil {
-		log.Fatalln(TAG, err)
-		return ErrReadingFile
+	//Reading File
+	contentBytes, err := reader.Read(filePath)
+	if err != nil{
+		log.Println(TAG, err)
+		return err
 	}
 
 	//Get Parser
 	parser := GetParser()
 
+	//Parsing
 	if err := parser.Parse(contentBytes, struc); err != nil {
-		log.Fatalln(TAG, "Could not parse file:", err)
+		log.Println(TAG, err)
 		return ErrParserFile
 	}
 

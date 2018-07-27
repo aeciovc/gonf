@@ -12,7 +12,7 @@ type other struct {
 	Count int
 }
 
-type config struct{
+type Config struct{
 	Name string
 	Other other
 }
@@ -20,7 +20,7 @@ type config struct{
 func TestParser(t *testing.T) {
 
 	//Inputs
-	conf := &config{}
+	conf := &Config{}
 	fileBytes := readFile("./etc/config.json")
 	fileBytesBadFormated := readFile("./etc/config_bad.json")
 
@@ -30,7 +30,7 @@ func TestParser(t *testing.T) {
 	}
 
 	//Outputs
-	confLoaded := &config{Name:"myconfig", Other: other{Count:80}}
+	confLoaded := &Config{Name:"myconfig", Other: other{Count:80}}
 
 	type outputs struct{
 		Struc interface{}
@@ -58,10 +58,10 @@ func TestParser(t *testing.T) {
 			parser := GetParser()
 			err := parser.Parse(tt.inputs.File, tt.inputs.Struc)
 
-			//get result
+			//get config result
 			resultConfig := interfaceToStructConfig(tt.inputs.Struc)
 
-			//get expected result
+			//get expected config result
 			expectedConfig := interfaceToStructConfig(tt.outputs.Struc)
 			
 			//Assert error
@@ -76,10 +76,10 @@ func TestParser(t *testing.T) {
 	}
 }
 
-func interfaceToStructConfig(i interface{}) *config{
-	var result *config
+func interfaceToStructConfig(i interface{}) *Config{
+	var result *Config
 	if i != nil{
-		result = i.(*config)
+		result = i.(*Config)
 	}
 
 	return result
