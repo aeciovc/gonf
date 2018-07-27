@@ -1,4 +1,4 @@
-package gonf
+package test
 
 import (
 	"fmt"

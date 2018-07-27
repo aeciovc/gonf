@@ -2,80 +2,57 @@ package gonf
 
 import (
 	"testing"
-
 	"io/ioutil"
 	_"log"
 	test "github.com/aeciovc/gonf/test"
 )
 
-type other struct {
-	Count int
-}
-
-type Config struct{
-	Name string
-	Other other
-}
-
-func TestParser(t *testing.T) {
+func TestParse(t *testing.T) {
 
 	//Inputs
-	conf := &Config{}
+	config := &Config{}
 	fileBytes := readFile("./etc/config.json")
-	fileBytesBadFormated := readFile("./etc/config_bad.json")
 
-	type inputs struct {
-		File []byte
-		Struc interface{}
-	}
+	//Output
+	configExpected := &Config{Name:"myconfig", Other: Other{Count:80}}
+	
+	//Get JSON Parser (Default)
+	parser := GetParser()
+	err := parser.Parse(fileBytes, config)
 
-	//Outputs
-	confLoaded := &Config{Name:"myconfig", Other: other{Count:80}}
+	test.Equals(t, err, nil)
+	test.Equals(t, configExpected.Name, config.Name)
+	test.Equals(t, configExpected.Other.Count, config.Other.Count)
+}
+	
 
-	type outputs struct{
-		Struc interface{}
-		Err   error
-	}
+func TestParse_InvalidStructReference(t *testing.T) {
 
-	tests := []struct {
-		name      string
-		inputs    inputs
-		outputs   outputs
-		
-	}{
-		{"TestParser - Invalid bytes file", inputs{File:nil, Struc:conf}, outputs{Struc:conf, Err:ErrParserFile}},
-		{"TestParser - Invalid struct reference", inputs{File:fileBytes, Struc:nil}, outputs{Struc:nil, Err:ErrInvalidStruct}},
-		{"TestParser - JSON bad formated", inputs{File:fileBytesBadFormated, Struc:conf}, outputs{Struc:conf, Err:ErrParserFile}},
-		{"TestParser - Success", inputs{File:fileBytes, Struc:conf}, outputs{Struc:confLoaded, Err:nil}},
-	}
+	//Inputs
+	fileBytes := readFile("./etc/config.json")
 
-	for _, tt := range tests {
+	//Get JSON Parser (Default)
+	parser := GetParser()
+	err := parser.Parse(fileBytes, nil)
 
-		// Run tests
-		t.Run(tt.name, func(t *testing.T) {
-			
-			//Get JSON Parser (Default)
-			parser := GetParser()
-			err := parser.Parse(tt.inputs.File, tt.inputs.Struc)
-
-			//get config result
-			resultConfig := interfaceToStructConfig(tt.inputs.Struc)
-
-			//get expected config result
-			expectedConfig := interfaceToStructConfig(tt.outputs.Struc)
-			
-			//Assert error
-			test.Equals(t, tt.outputs.Err, err)
-
-			//Assert Config loaded
-			if tt.outputs.Err == nil{
-				test.Equals(t, expectedConfig.Name, resultConfig.Name)
-				test.Equals(t, expectedConfig.Other.Count, resultConfig.Other.Count)
-			}
-		})
-	}
+	test.Equals(t, err, ErrInvalidStruct)
 }
 
+func TestParse_BadFormatFile(t *testing.T) {
+
+	//Inputs
+	config := &Config{}
+	fileBytes := readFile("./etc/config_bad.json")
+
+	//Get JSON Parser (Default)
+	parser := GetParser()
+	err := parser.Parse(fileBytes, config)
+
+	test.Equals(t, err, ErrParserFile)
+}
+
+
+/*************************** Private ***************************/
 func interfaceToStructConfig(i interface{}) *Config{
 	var result *Config
 	if i != nil{
@@ -92,7 +69,6 @@ func readFile(path string) []byte{
 	return contentBytes
 }
 
-//Check error
 func check(e error) {
     if e != nil {
         panic(e)

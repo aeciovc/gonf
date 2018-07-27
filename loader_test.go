@@ -8,7 +8,7 @@ import (
 func TestLoad(t *testing.T) {
 
 	config := &Config{}
-	configExpected := &Config{Name:"myconfig", Other: other{Count:80}}
+	configExpected := &Config{Name:"myconfig", Other: Other{Count:80}}
 
 	err := Load("./etc/config.json", config)
 

@@ -14,9 +14,9 @@ var (
 
 //Parser Errrors
 var (
-	//
+	// ErrParserFile is returned when JSON has a bad format content
 	ErrParserFile = errors.New("Parse failed, bad format file")
 
-	//
+	// ErrInvalidStruct is returned when a nil struct is passed as param to load configs
 	ErrInvalidStruct = errors.New("Invalid Struct reference")
 )
